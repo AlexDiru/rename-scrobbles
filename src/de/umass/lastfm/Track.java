@@ -263,6 +263,20 @@ public class Track extends MusicEntry {
 		Result result = Caller.getInstance().call("track.getTopTags", apiKey, params);
 		return ResponseBuilder.buildCollection(result, Tag.class);
 	}
+	
+	/**
+	 * Converts this object to a ScrobbleData object
+	 * @return The scrobble data
+	 */
+	public ScrobbleData getScrobbleData() {
+		ScrobbleData data = new ScrobbleData();
+		data.setAlbum(getAlbum());
+		data.setArtist(getArtist());
+		data.setDuration(getDuration());
+		data.setTimestamp((int) (getPlayedWhen().getTime() / 1000));
+		data.setTrack(getName());
+		return data;
+	}
 
 	/**
 	 * Retrieves the top fans for the given track. You either have to specify a
