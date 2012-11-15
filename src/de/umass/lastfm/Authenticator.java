@@ -49,6 +49,8 @@ public class Authenticator {
 
 	private Authenticator() {
 	}
+	
+	private static boolean sessionSuccessful;
 
 	/**
 	 * Create a web service session for a user. Used for authenticating a user when the password can be inputted by the user.
@@ -68,8 +70,17 @@ public class Authenticator {
 		String sig = createSignature("auth.getMobileSession", params, secret);
 		Result result = Caller.getInstance()
 				.call("auth.getMobileSession", apiKey, "username", username, "authToken", authToken, "api_sig", sig);
+		sessionSuccessful = result.isSuccessful();
 		DomElement element = result.getContentElement();
 		return Session.sessionFromElement(element, apiKey, secret);
+	}
+	
+	/**
+	 * Whether the session was successful
+	 * @return Flag
+	 */
+	public static boolean isSuccessful() {
+		return sessionSuccessful;
 	}
 
 	/**

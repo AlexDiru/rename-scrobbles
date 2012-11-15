@@ -11,9 +11,28 @@ import de.umass.lastfm.scrobble.ScrobbleResult;
 
 public class LastFMSession {
 
+	/**
+	 * Holds the API key and secret
+	 */
 	private APIHandler apiHandler = new APIHandler();
+	
+	/**
+	 * Holds the username and password
+	 */
 	private CredentialsHandler credentialsHandler = new CredentialsHandler();
+	
+	/**
+	 * The session used to scrobble
+	 */
 	private de.umass.lastfm.Session session;
+	
+	/**
+	 * Whether the session connected successfully
+	 * @return Flag
+	 */
+	public boolean isSessionSuccessful() {
+		return Authenticator.isSuccessful();
+	}
 
 	/**
 	 * @author Alex
@@ -22,6 +41,19 @@ public class LastFMSession {
 		apiHandler.readApiKeyFromFile("C:/Users/Alex/Desktop/api.txt");
 		credentialsHandler.readCredentialsFromFile("C:/Users/Alex/Desktop/det.txt");
 		session = Authenticator.getMobileSession(credentialsHandler.username, credentialsHandler.password, apiHandler.apiKey, apiHandler.apiSecret);
+
+		if (!Authenticator.isSuccessful())
+			System.out.println("Connection failed. Check username and/or password.");
+	}
+	
+	public LastFMSession(String username, String password) {
+		apiHandler.readApiKeyFromFile("C:/Users/Alex/Desktop/api.txt");
+		credentialsHandler.username = username;
+		credentialsHandler.password = password;
+		session = Authenticator.getMobileSession(credentialsHandler.username, credentialsHandler.password, apiHandler.apiKey, apiHandler.apiSecret);
+
+		if (!Authenticator.isSuccessful())
+			System.out.println("Connection failed. Check username and/or password.");
 	}
 
 	/**
@@ -56,7 +88,7 @@ public class LastFMSession {
 			// Iterate the tracks and modify the artist parameters and add to
 			// the convert list
 			for (Track track : tracks)
-				toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, newName, "", false, false, track.getPlayedWhen()));
+				toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, newName, "", false, false, track.getPlayedWhen(), track.getAlbum()));
 		}
 
 		for (Track t : toConvert) {
@@ -70,11 +102,15 @@ public class LastFMSession {
 	 * @author Alex
 	 */
 	private void scrobble(Track track) {
-		System.out.println(track.getArtist() + " " + track.getName());
-		ScrobbleResult result = Track.scrobble(track.getScrobbleData(), session);
+		System.out.println("Scrobbling: " + track.getArtist() + " - " + track.getName() + " ~ " + track.getAlbum());
+		ScrobbleResult result = Track.scrobble(track.getScrobbleData(), session, UnixTime.getDateInThePastTwoWeeks());
 		if (result.isSuccessful() && !result.isIgnored())
-			System.out.println("success");
-		else
-			System.out.println("failure");
+			System.out.println("Success");
+		else {
+			System.out.println("Failed");
+			System.out.println("Error code: " + result.getErrorCode());
+			System.out.println("Error message: " + result.getErrorMessage());
+			System.out.println("Ignored Error message: " + result.getIgnoredMessage());
+		}
 	}
 }

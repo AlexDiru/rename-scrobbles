@@ -18,6 +18,10 @@ public class CredentialsHandler {
 	 * Password of the user who is renaming an artist
 	 */
 	public String password;
+	
+	public boolean isEmpty() {
+		return username.equals("") && password.equals("");
+	}
 
 	/**
 	 * Reads the api key from the specified file File should just consist of two

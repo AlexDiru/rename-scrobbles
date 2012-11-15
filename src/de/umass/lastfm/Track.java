@@ -93,13 +93,14 @@ public class Track extends MusicEntry {
 		this.nowPlaying = nowPlaying;
 	}
 
-	public Track(String name, String url, String mbid, int playcount, int listeners, boolean streamable, String artist, String artistMbid, boolean fullTrackAvailable, boolean nowPlaying, Date playedWhen) {
+	public Track(String name, String url, String mbid, int playcount, int listeners, boolean streamable, String artist, String artistMbid, boolean fullTrackAvailable, boolean nowPlaying, Date playedWhen, String album) {
 		super(name, url, mbid, playcount, listeners, streamable);
 		this.artist = artist;
 		this.artistMbid = artistMbid;
 		this.fullTrackAvailable = fullTrackAvailable;
 		this.nowPlaying = nowPlaying;
 		this.playedWhen = playedWhen;
+		this.album = album;
 	}
 
 	/**
@@ -747,6 +748,25 @@ public class Track extends MusicEntry {
 		params.put("artist", scrobbleData.getArtist());
 		params.put("track", scrobbleData.getTrack());
 		params.put("timestamp", String.valueOf(scrobbleData.getTimestamp()));
+		// optional params
+		MapUtilities.nullSafePut(params, "album", scrobbleData.getAlbum());
+		MapUtilities.nullSafePut(params, "albumArtist", scrobbleData.getAlbumArtist());
+		MapUtilities.nullSafePut(params, "duration", scrobbleData.getDuration());
+		MapUtilities.nullSafePut(params, "mbid", scrobbleData.getMusicBrainzId());
+		MapUtilities.nullSafePut(params, "trackNumber", scrobbleData.getTrackNumber());
+		MapUtilities.nullSafePut(params, "streamId", scrobbleData.getStreamId());
+		params.put("chosenByUser", StringUtilities.convertFromBoolean(scrobbleData.isChosenByUser()));
+
+		Result result = Caller.getInstance().call("track.scrobble", session, params);
+		return convertToScrobbleResults(result, ScrobbleResultType.SINGLE_SCROBBLE).get(0);
+	}
+	
+	public static ScrobbleResult scrobble(ScrobbleData scrobbleData, Session session, int timestamp) {
+		Map<String, String> params = new HashMap<String, String>();
+		// required params
+		params.put("artist", scrobbleData.getArtist());
+		params.put("track", scrobbleData.getTrack());
+		params.put("timestamp", String.valueOf(timestamp));
 		// optional params
 		MapUtilities.nullSafePut(params, "album", scrobbleData.getAlbum());
 		MapUtilities.nullSafePut(params, "albumArtist", scrobbleData.getAlbumArtist());
