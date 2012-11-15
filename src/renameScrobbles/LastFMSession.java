@@ -15,19 +15,20 @@ public class LastFMSession {
 	 * Holds the API key and secret
 	 */
 	private APIHandler apiHandler = new APIHandler();
-	
+
 	/**
 	 * Holds the username and password
 	 */
 	private CredentialsHandler credentialsHandler = new CredentialsHandler();
-	
+
 	/**
 	 * The session used to scrobble
 	 */
 	private de.umass.lastfm.Session session;
-	
+
 	/**
 	 * Whether the session connected successfully
+	 * 
 	 * @return Flag
 	 */
 	public boolean isSessionSuccessful() {
@@ -35,17 +36,12 @@ public class LastFMSession {
 	}
 
 	/**
-	 * @author Alex
+	 * Reads the api key from a file and initialises the session
+	 * @param username
+	 *            Username of the user
+	 * @param password
+	 *            Password of the user
 	 */
-	public LastFMSession() {
-		apiHandler.readApiKeyFromFile("C:/Users/Alex/Desktop/api.txt");
-		credentialsHandler.readCredentialsFromFile("C:/Users/Alex/Desktop/det.txt");
-		session = Authenticator.getMobileSession(credentialsHandler.username, credentialsHandler.password, apiHandler.apiKey, apiHandler.apiSecret);
-
-		if (!Authenticator.isSuccessful())
-			System.out.println("Connection failed. Check username and/or password.");
-	}
-	
 	public LastFMSession(String username, String password) {
 		apiHandler.readApiKeyFromFile("C:/Users/Alex/Desktop/api.txt");
 		credentialsHandler.username = username;
@@ -56,6 +52,10 @@ public class LastFMSession {
 			System.out.println("Connection failed. Check username and/or password.");
 	}
 
+	public LastFMSession() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * Renames all the songs by an artist to a different artist
 	 * 
@@ -63,7 +63,6 @@ public class LastFMSession {
 	 *            The artist to get the tracks of
 	 * @param newName
 	 *            The name to rename the artist to
-	 * @author Alex
 	 */
 	public void renameArtist(String artistName, String newName) {
 		// Get the first page of results
@@ -88,12 +87,13 @@ public class LastFMSession {
 			// Iterate the tracks and modify the artist parameters and add to
 			// the convert list
 			for (Track track : tracks)
-				toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, newName, "", false, false, track.getPlayedWhen(), track.getAlbum()));
+				toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, newName, "", false, false, track.getPlayedWhen(), track
+						.getAlbum()));
 		}
-		
+
 		scrobbleTracks(toConvert);
 	}
-	
+
 	/**
 	 * Renames all the songs by an artist to a different album
 	 * 
@@ -101,7 +101,6 @@ public class LastFMSession {
 	 *            The artist to get the tracks of
 	 * @param newName
 	 *            The name to rename the artist to
-	 * @author Alex
 	 */
 	public void renameAlbum(String artistName, String albumName, String newName) {
 		// Get the first page of results
@@ -126,14 +125,21 @@ public class LastFMSession {
 			// Iterate the tracks and modify the artist parameters and add to
 			// the convert list
 			for (Track track : tracks)
-				//Filter by albums
+				// Filter by albums
 				if (track.getAlbum().equals(albumName))
-					toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, track.getArtist(), "", false, false, track.getPlayedWhen(), newName));
+					toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, track.getArtist(), "", false, false, track
+							.getPlayedWhen(), newName));
 		}
-		
+
 		scrobbleTracks(toConvert);
 	}
-	
+
+	/**
+	 * Scrobbles a list of tracks
+	 * 
+	 * @param tracks
+	 *            The tracks
+	 */
 	private void scrobbleTracks(ArrayList<Track> tracks) {
 		for (Track track : tracks) {
 			scrobble(track);
@@ -141,8 +147,10 @@ public class LastFMSession {
 	}
 
 	/**
+	 * Scrobbles a track
+	 * 
 	 * @param track
-	 * @author Alex
+	 *            The track
 	 */
 	private void scrobble(Track track) {
 		System.out.println("Scrobbling: " + track.getArtist() + " - " + track.getName() + " ~ " + track.getAlbum());
