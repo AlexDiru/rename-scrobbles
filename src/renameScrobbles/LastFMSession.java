@@ -126,7 +126,9 @@ public class LastFMSession {
 			// Iterate the tracks and modify the artist parameters and add to
 			// the convert list
 			for (Track track : tracks)
-				toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, track.getArtist(), "", false, false, track.getPlayedWhen(), newName));
+				//Filter by albums
+				if (track.getAlbum().equals(albumName))
+					toConvert.add(new Track(track.getName(), track.getUrl(), track.getMbid(), track.getPlaycount(), track.getListeners(), false, track.getArtist(), "", false, false, track.getPlayedWhen(), newName));
 		}
 		
 		scrobbleTracks(toConvert);
